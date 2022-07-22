@@ -38,13 +38,7 @@ def load_labels():
     return imagenet_labels
 
 
-def preprocess_img(img):
-    img = img.resize(IMAGE_SHAPE)
-    img = np.array(img) / 255.0
-    return img
-
-
-def post_process_results(result):
+def decode_predictions(result):
     predicted_class = tf.math.argmax(result[0], axis=-1)
     scores = tf.nn.softmax(result[0])
     probability = np.max(scores)
@@ -56,12 +50,13 @@ def post_process_results(result):
             "probability": probability.item()}
 
 
-def tf_predict(img_url, serve_type="REST"):
+def preprocess_image(img_url):
     _img = load_image(img_url)
-    img = preprocess_img(_img)
-    if serve_type == "REST":
-        pred = serve_rest(img[np.newaxis, ...])
-    result = post_process_results(pred)
-    return result
+    if _img is None:
+        return None
+    img = _img.resize(IMAGE_SHAPE)
+    img = np.array(img) / 255.0
+    return img[np.newaxis, ...]
+
 
 
