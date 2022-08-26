@@ -2,6 +2,9 @@ import tensorflow as tf
 import tensorflow_hub as hub
 import numpy as np
 import time
+import json
+import requests
+
 
 from src.utils.utilities import *
 from src.app.tf_serve import *
@@ -17,17 +20,19 @@ def load_model():
     classifier = tf.keras.Sequential([
         hub.KerasLayer(classifier_model, input_shape=IMAGE_SHAPE + (3,))
     ])
+    print("Model loaded")
     return classifier
 
 
 def save_model():
     model = load_model()
     ts = int(time.time())
-    base_file_path = os.getcwd() + "/models/"
+    base_file_path = os.getcwd() + "/src/models/"
     print(base_file_path)
 
     file_path = base_file_path + str(ts)
     model.save(filepath=file_path, save_format='tf')
+    print(f"Model Saved under {file_path}")
 
 
 def load_labels():
@@ -57,6 +62,3 @@ def preprocess_image(img_url):
     img = _img.resize(IMAGE_SHAPE)
     img = np.array(img) / 255.0
     return img[np.newaxis, ...]
-
-
-
