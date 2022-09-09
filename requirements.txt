@@ -1,5 +1,7 @@
-Pillow==9.1.1
 tensorflow
 tensorflow_hub
 requests
 numpy
+Pillow
+grpcio
+tensorflow_serving_api

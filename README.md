@@ -1,13 +1,20 @@
 # img-classifier-tfx
 
 ## Steps to run the model server
-* `docker run --name myTFServing -it -v /Users/ashmi/Scripts/img-classifier-tfx:/img-classifier-tfx -p 9001:9001 --entrypoint /bin/bash tensorflow/serving
+* `docker run --name myTFServing -it -v /Users/ashmi/Scripts/open-source/img-classifier-tfx:/img-classifier-tfx -p 9001:9001 --entrypoint /bin/bash tensorflow/serving
 `
 * `cd img-classifier-tfx/`
-* `tensorflow_model_server --rest_api_port=9001 --model_name=1657646009 --model_base_path=/img-classifier-tfx/src/pred/models`
-* `curl -X GET http:/localhost:9001/v1/models/1657646009`
-* `curl -X POST http:/localhost:9001/v1/models/1657646009:predit -d @data.json -H "Content-Type: application/json"
+### REST API
+* `tensorflow_model_server --rest_api_port=9001 --model_name=1662727000 --model_base_path=/img-classifier-tfx/src/models`
+* `curl -X GET http:/localhost:9001/v1/models/1661517839`
+* `curl -X POST http:/localhost:9001/v1/models/1661517839:predict -d @data.json -H "Content-Type: application/json"
 `
+### gRPC Server
+* `tensorflow_model_server --port=9000 --model_name=1662731826 --model_base_path=/img-classifier-tfx/src/models`
+
+### Running both `REST API` and `gRPC` together
+* `docker run --name myTFServing -it -v /Users/ashmi/Scripts/open-source/img-classifier-tfx:/img-classifier-tfx -p 9001:9001 -p 9000:9000 --entrypoint /bin/bash tensorflow/serving`
+* `tensorflow_model_server --port=9000 --rest_api_port=9001 --model_name=1662731826 --model_base_path=/img-classifier-tfx/src/models`
 
 ## References & Further Readings
 * [https://towardsdatascience.com/deploying-machine-learning-models-with-tensorflow-serving-an-introduction-6d49697a1315](https://towardsdatascience.com/deploying-machine-learning-models-with-tensorflow-serving-an-introduction-6d49697a1315)

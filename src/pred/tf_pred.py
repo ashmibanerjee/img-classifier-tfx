@@ -14,9 +14,7 @@ IMAGE_SHAPE = (224, 224)
 
 
 def load_model():
-    mobilenet_v2 = "https://tfhub.dev/google/tf2-preview/mobilenet_v2/classification/4"
-    classifier_model = mobilenet_v2
-
+    classifier_model = "https://tfhub.dev/google/imagenet/efficientnet_v2_imagenet1k_s/classification/2"
     classifier = tf.keras.Sequential([
         hub.KerasLayer(classifier_model, input_shape=IMAGE_SHAPE + (3,))
     ])
@@ -31,7 +29,7 @@ def save_model():
     print(base_file_path)
 
     file_path = base_file_path + str(ts)
-    model.save(filepath=file_path, save_format='tf')
+    model.save(filepath=file_path, save_format=".tf", signatures=None)
     print(f"Model Saved under {file_path}")
 
 

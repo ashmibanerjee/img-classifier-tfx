@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 src/pred/models
 data.json
+src/models/
