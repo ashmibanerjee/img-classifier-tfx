@@ -12,10 +12,10 @@ You can also set the following as environment variables
 STAGE = "pre-train"
 
 METHOD = "rest"
-#METHOD = "gRPC"
+# METHOD = "gRPC"
 
 if __name__ == "__main__":
-    if not is_dir_exists(MODEL_LOCATION) :
+    if not is_dir_exists(MODEL_LOCATION):
         # Create a new directory because it does not exist
         os.makedirs(MODEL_LOCATION)
     if is_directory_empty(MODEL_LOCATION) or STAGE == "train":
