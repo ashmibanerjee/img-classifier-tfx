@@ -130,3 +130,7 @@ dmypy.json
 src/pred/models
 data.json
 src/models/
+.DS_Store
+.idea/
+data/
+results/
