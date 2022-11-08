@@ -23,3 +23,4 @@
 * [https://www.tensorflow.org/tfx/tutorials/serving/rest_simple](https://www.tensorflow.org/tfx/tutorials/serving/rest_simple)
 * [https://levelup.gitconnected.com/serving-an-image-classification-model-with-tensorflow-serving-c4657584d73d](https://levelup.gitconnected.com/serving-an-image-classification-model-with-tensorflow-serving-c4657584d73d)
 * [https://towardsdatascience.com/image-classification-on-tensorflow-serving-with-grpc-or-rest-call-for-inference-fd3216ebd4f3](https://towardsdatascience.com/image-classification-on-tensorflow-serving-with-grpc-or-rest-call-for-inference-fd3216ebd4f3)
+* [https://conferences.oreilly.com/tensorflow/tf-ca-2019/cdn.oreillystatic.com/en/assets/1/event/308/Advanced%20model%20deployments%20with%20TensorFlow%20Serving%20Presentation.pdf](https://conferences.oreilly.com/tensorflow/tf-ca-2019/cdn.oreillystatic.com/en/assets/1/event/308/Advanced%20model%20deployments%20with%20TensorFlow%20Serving%20Presentation.pdf)

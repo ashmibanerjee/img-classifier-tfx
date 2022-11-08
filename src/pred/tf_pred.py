@@ -5,7 +5,6 @@ import time
 import json
 import requests
 
-
 from src.utils.utilities import *
 from src.app.tf_serve import *
 
@@ -46,11 +45,28 @@ def decode_predictions(result):
     scores = tf.nn.softmax(result[0])
     probability = np.max(scores)
 
-    imagenet_labels = load_labels()
-    predicted_class_name = imagenet_labels[predicted_class]
+    labels = load_labels() # loads image net labels
+    predicted_class_name = labels[predicted_class]
 
     return {"predicted_label": predicted_class_name,
             "probability": probability.item()}
+
+
+def parse_record(record):
+    # depth_major = record.reshape(3, 32, 32)
+    # image = np.transpose(depth_major, [1, 2, 0])
+    image = np.resize(record,(224,224,3))
+    image = np.array(image) / 255.0
+    return image[np.newaxis, ...]
+
+
+def preprocess_cifar_data(file_path):
+    x_train, y_train = load_cifar_data(file_path)
+    images = []
+    for x in x_train[:5]:
+        image = parse_record(x)
+        images.append(image)
+    return images, y_train
 
 
 def preprocess_image(img_url):

@@ -28,6 +28,35 @@ def write_file(data, file_name="data.json"):
         json.dump(data, f, ensure_ascii=False, indent=4)
 
 
+def make_rest_api_call(img, rest_api_url):
+    data = json.dumps({"signature_name": "serving_default", "instances": img.tolist()})
+    # write_file(data)
+    headers = {"content-type": "application/json"}
+    json_response = requests.post(rest_api_url, data=data, headers=headers)
+    try:
+        predictions = json.loads(json_response.text)['predictions']
+        return predictions
+    except Exception as e:
+        print(e)
+        return None
+
+
+def serve_rest_cifar(file_path, rest_api_url=None):
+    if rest_api_url is None:
+        try:
+            rest_api_url = f'http://localhost:{REST_API_PORT}/v1/models/{get_model_name(MODEL_LOCATION)}:predict'
+        except Exception as e:
+            print(e)
+    images, y_train = preprocess_cifar_data(file_path)
+    results = []
+    for image in images:
+        prediction = make_rest_api_call(image, rest_api_url)
+        result = decode_predictions(prediction)
+        print(result)
+        results.append(result)
+    return results
+
+
 def serve_rest(img_url, rest_api_url=None):
     if rest_api_url is None:
         try:
@@ -36,13 +65,7 @@ def serve_rest(img_url, rest_api_url=None):
             print(e)
 
     img = preprocess_image(img_url)
-    # print("Img preprocessing done!")
-    data = json.dumps({"signature_name": "serving_default", "instances": img.tolist()})
-    # write_file(data)
-    headers = {"content-type": "application/json"}
-    json_response = requests.post(rest_api_url, data=data, headers=headers)
-    # print("json response received")
-    predictions = json.loads(json_response.text)['predictions']
+    predictions = make_rest_api_call(img, rest_api_url)
     results = decode_predictions(predictions)
     # print("predictions decoded")
     return results
@@ -51,17 +74,7 @@ def serve_rest(img_url, rest_api_url=None):
 GRPC_MAX_RECEIVE_MESSAGE_LENGTH = 4096 * 4096 * 3  # Max LENGTH the GRPC should handle
 
 
-def serve_grpc(img_url, model_name=None, grpc_url=None, mode="one-by-one"):
-    if not isinstance(img_url, str):  # when input is already preprocessed
-        print("image is already preprocessed")
-        img = img_url
-    else:
-        print("we preprocess image")
-        img = preprocess_image(img_url)
-    if grpc_url is None:
-        grpc_url = f"localhost:{GRPC_PORT}"
-    if model_name is None:
-        model_name = get_model_name(MODEL_LOCATION)
+def make_grpc_req(img, model_name, grpc_url, mode="one-by-one"):
     channel = grpc.insecure_channel(grpc_url,
                                     options=[('grpc.max_receive_message_length', GRPC_MAX_RECEIVE_MESSAGE_LENGTH)])
 
@@ -69,8 +82,6 @@ def serve_grpc(img_url, model_name=None, grpc_url=None, mode="one-by-one"):
     grpc_request = predict_pb2.PredictRequest()
     grpc_request.model_spec.name = model_name
     grpc_request.model_spec.signature_name = 'serving_default'
-
-    # img = preprocess_image(img_url)
 
     if mode == "one-by-one":
         grpc_request.inputs['keras_layer_input'].CopyFrom(tf.make_tensor_proto(img.tolist(), shape=img.shape))
@@ -84,7 +95,22 @@ def serve_grpc(img_url, model_name=None, grpc_url=None, mode="one-by-one"):
     outputs_tensor_proto = predictions.outputs["keras_layer"]
     shape = tf.TensorShape(outputs_tensor_proto.tensor_shape)
     outputs = np.array(outputs_tensor_proto.float_val).reshape(shape.as_list())
+    return outputs
 
+
+def serve_grpc(img_url, model_name=None, grpc_url=None, mode="one-by-one"):
+    if not isinstance(img_url, str):  # when input is already preprocessed
+        # print("image is already preprocessed")
+        img = img_url
+    else:
+        print("we preprocess image")
+        img = preprocess_image(img_url)
+    if grpc_url is None:
+        grpc_url = f"localhost:{GRPC_PORT}"
+    if model_name is None:
+        model_name = get_model_name(MODEL_LOCATION)
+
+    outputs = make_grpc_req(img, model_name, grpc_url)
     # decoding predictions
     results = decode_predictions(outputs)
     # print("predictions decoded")

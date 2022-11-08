@@ -13,7 +13,7 @@ STAGE = "pre-train"
 
 METHOD = "rest"
 # METHOD = "gRPC"
-
+DATA_LOCATION = os.getcwd() + "/data/cifar-10-batches-py"
 if __name__ == "__main__":
     if not is_dir_exists(MODEL_LOCATION):
         # Create a new directory because it does not exist
@@ -23,12 +23,13 @@ if __name__ == "__main__":
         save_model()
 
     try:
-        for IMAGE_LINK in IMAGE_LINKS:
-            if METHOD == "rest":
-                res = serve_rest(IMAGE_LINK["url"])
-            else:
-                res = serve_grpc(IMAGE_LINK["url"])
-            print(res)
+        # for IMAGE_LINK in IMAGE_LINKS:
+        #     if METHOD == "rest":
+        #         res = serve_rest(IMAGE_LINK["url"])
+        #     else:
+        #         res = serve_grpc(IMAGE_LINK["url"])
+        #     print(res)
+        serve_rest_cifar(DATA_LOCATION + "/data_batch_", "http://localhost:9001/v1/models/1662731826:predict")
     except Exception as e:
         print("Server not running \n")
         print(e)
